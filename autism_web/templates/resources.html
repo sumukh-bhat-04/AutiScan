@@ -1,0 +1,370 @@
+{% extends 'base.html' %}
+
+{% block title %}Resources | AutiScan{% endblock %}
+
+{% block extra_head %}
+<!-- Reusing custom styles but leveraging theme variables -->
+<style>
+    .resources-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        width: 100%;
+    }
+
+    /* Hero Search Section */
+    .resource-hero {
+        text-align: center;
+        margin-bottom: 3rem;
+        padding: 3rem 1rem;
+        background: linear-gradient(135deg, var(--bg-secondary), var(--bg-accent));
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+    }
+
+    .search-box {
+        position: relative;
+        max-width: 600px;
+        margin: 2rem auto 0;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 1rem 1.5rem;
+        padding-left: 3rem;
+        border-radius: 50px;
+        border: 2px solid var(--border-color);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1.2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+        pointer-events: none;
+    }
+
+    /* Categories */
+    .category-filters {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 3rem;
+    }
+
+    .filter-btn {
+        padding: 0.6rem 1.5rem;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .filter-btn:hover,
+    .filter-btn.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    /* Resource Grid */
+    .resource-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .resource-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 0;
+        overflow: hidden;
+        transition: transform 0.3s, box-shadow 0.3s;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .resource-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        background: var(--bg-accent);
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        background: #fff;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        font-size: 1.2rem;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .resource-tag {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+    }
+
+    /* Tag Colors */
+    .tag-guide {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    /* Blue */
+    .tag-video {
+        background: #fce7f3;
+        color: #9d174d;
+    }
+
+    /* Pink */
+    .tag-article {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    /* Green */
+    .tag-tool {
+        background: #fff7ed;
+        color: #9a3412;
+    }
+
+    /* Orange */
+
+    .learn-link {
+        margin-top: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .disclaimer-box {
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        color: #92400e;
+        padding: 2rem;
+        border-radius: 12px;
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="resources-container fade-in">
+
+    <!-- Hero Header -->
+    <div class="resource-hero">
+        <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Autism Resources Library</h1>
+        <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto;">
+            Curated guides, tools, and articles to support your journey.
+        </p>
+
+        <div class="search-box">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="resourceSearch" class="search-input" placeholder="Search resources..."
+                onkeyup="filterResources()">
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="category-filters">
+        <button class="filter-btn active" onclick="filterCategory('all')">All Resources</button>
+        <button class="filter-btn" onclick="filterCategory('guide')">Guides</button>
+        <button class="filter-btn" onclick="filterCategory('article')">Articles</button>
+        <button class="filter-btn" onclick="filterCategory('tool')">Tools</button>
+    </div>
+
+    <!-- Grid -->
+    <div class="resource-grid" id="resourceGrid">
+
+        <!-- Item 1 -->
+        <div class="resource-card" data-category="guide">
+            <div class="card-header">
+                <div class="card-icon">📚</div>
+                <h3 style="margin:0; font-size:1.1rem;">Understanding ASD</h3>
+            </div>
+            <div class="card-body">
+                <span class="resource-tag tag-guide">Guide</span>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">A comprehensive introduction to Autism
+                    Spectrum Disorder symptoms and traits.</p>
+                <a href="https://www.autismspeaks.org/what-autism" target="_blank" class="learn-link">Read Guide
+                    &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="resource-card" data-category="article">
+            <div class="card-header">
+                <div class="card-icon">🧠</div>
+                <h3 style="margin:0; font-size:1.1rem;">Sensory Processing</h3>
+            </div>
+            <div class="card-body">
+                <span class="resource-tag tag-article">Article</span>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Managing sensory overload and creating
+                    supportive environments.</p>
+                <a href="https://childmind.org/article/sensory-processing-issues-explained/" target="_blank"
+                    class="learn-link">Read Article &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="resource-card" data-category="tool">
+            <div class="card-header">
+                <div class="card-icon">🛠️</div>
+                <h3 style="margin:0; font-size:1.1rem;">Communication Tools</h3>
+            </div>
+            <div class="card-body">
+                <span class="resource-tag tag-tool">Tool</span>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Visual schedules and communication
+                    boards for daily routines.</p>
+                <a href="#" class="learn-link">View Tools &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Item 4 -->
+        <div class="resource-card" data-category="guide">
+            <div class="card-header">
+                <div class="card-icon">🎓</div>
+                <h3 style="margin:0; font-size:1.1rem;">Education Support</h3>
+            </div>
+            <div class="card-body">
+                <span class="resource-tag tag-guide">Guide</span>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Navigating individual education plans
+                    (IEPs) and school accommodations.</p>
+                <a href="#" class="learn-link">Read Guide &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Item 5 -->
+        <div class="resource-card" data-category="article">
+            <div class="card-header">
+                <div class="card-icon">🤝</div>
+                <h3 style="margin:0; font-size:1.1rem;">Social Skills</h3>
+            </div>
+            <div class="card-body">
+                <span class="resource-tag tag-article">Article</span>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Building meaningful relationships and
+                    social confidence.</p>
+                <a href="#" class="learn-link">Read Article &rarr;</a>
+            </div>
+        </div>
+
+        <!-- Item 6 -->
+        <div class="resource-card" data-category="tool">
+            <div class="card-header">
+                <div class="card-icon">📅</div>
+                <h3 style="margin:0; font-size:1.1rem;">Daily Planner PDF</h3>
+            </div>
+            <div class="card-body">
+                <span class="resource-tag tag-tool">Tool</span>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Downloadable template for structuring
+                    daily activities.</p>
+                <a href="#" class="learn-link">Download PDF &darr;</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer-box">
+        <strong>Medical Disclaimer:</strong> This content is for educational purposes only and is not a substitute for
+        professional medical advice, diagnosis, or treatment.
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center;">
+        <a href="/dashboard/" style="color: var(--text-secondary); font-weight: 500;">&larr; Return to Dashboard</a>
+    </div>
+
+</div>
+
+<script>
+    // Simple Search Filter
+    function filterResources() {
+        let input = document.getElementById('resourceSearch').value.toLowerCase();
+        let cards = document.getElementsByClassName('resource-card');
+
+        for (let i = 0; i < cards.length; i++) {
+            let title = cards[i].querySelector('h3').innerText.toLowerCase();
+            let desc = cards[i].querySelector('p').innerText.toLowerCase();
+
+            if (title.includes(input) || desc.includes(input)) {
+                cards[i].style.display = "";
+            } else {
+                cards[i].style.display = "none";
+            }
+        }
+    }
+
+    // Category Filter
+    function filterCategory(category) {
+        let cards = document.getElementsByClassName('resource-card');
+        let buttons = document.getElementsByClassName('filter-btn');
+
+        // Update active button
+        for (let btn of buttons) {
+            btn.classList.remove('active');
+            if (btn.innerText.toLowerCase().includes(category) || (category === 'all' && btn.innerText.includes('All'))) {
+                btn.classList.add('active');
+            }
+        }
+
+        for (let i = 0; i < cards.length; i++) {
+            let cardCat = cards[i].getAttribute('data-category');
+            if (category === 'all' || cardCat === category) {
+                cards[i].style.display = "";
+            } else {
+                cards[i].style.display = "none";
+            }
+        }
+    }
+</script>
+{% endblock %}

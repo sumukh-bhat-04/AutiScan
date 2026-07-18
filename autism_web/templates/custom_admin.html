@@ -1,0 +1,536 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard | Autism Screening{% endblock %}
+
+{% block extra_head %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    /* Styling to hide specific header link using Nth-child or ID if possible. 
+       Since base.html doesn't have ID for the link, we can just hide the whole right header part 
+       and reconstruct it if needed, or simply force hide it with a targeted selector if base generic. 
+       Actually, base.html uses a class '.header div'. We can override it or just inject style to hide it.
+       Let's assume we want to hide the existing Dashboard link. It might be easier to just create a new block in base.html 
+       but we want to avoid editing base.html too much to avoid breaking other pages.
+       Wait, custom_admin is a separate page.
+    */
+    .header div a[href="/dashboard/"] {
+        display: none !important;
+    }
+
+    /* Dashboard specific styles */
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+        width: 100%;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 1rem;
+    }
+
+    .page-header h2 {
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .logout-btn {
+        background-color: var(--error-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: background 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .logout-btn:hover {
+        opacity: 0.9;
+    }
+
+    .admin-link {
+        margin-right: 15px;
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        background: #eff6ff;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .admin-link:hover {
+        background: #dbeafe;
+    }
+
+    .action-btn {
+        color: white;
+        padding: 6px 14px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: opacity 0.2s;
+    }
+
+    .action-btn:hover {
+        opacity: 0.9;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: var(--bg-secondary);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border-color);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        transition: transform 0.2s;
+        color: var(--text-primary);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-title {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+        color: var(--text-primary);
+        font-size: 2.5rem;
+        font-weight: 800;
+    }
+
+    /* Charts & Table Section */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 2rem;
+    }
+
+    .panel {
+        background: var(--bg-secondary);
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .panel-header {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Table Styles */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem;
+        color: var(--text-primary);
+    }
+
+    th {
+        text-align: left;
+        padding: 1rem;
+        background-color: var(--bg-primary);
+        color: var(--text-secondary);
+        font-weight: 600;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-primary);
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    .risk-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .risk-high {
+        background-color: #fee2e2;
+        color: #991b1b;
+    }
+
+    .risk-moderate {
+        background-color: #fef3c7;
+        color: #92400e;
+    }
+
+    .risk-low {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    @media (max-width: 900px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-content {
+        background-color: var(--bg-secondary);
+        margin: 5% auto;
+        padding: 2rem;
+        border: 1px solid var(--border-color);
+        width: 80%;
+        max-width: 800px;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        position: relative;
+        color: var(--text-primary);
+    }
+
+    .close {
+        color: var(--text-secondary);
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: var(--primary-color);
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Table in modal */
+    .scrolly-table {
+        max-height: 400px;
+        overflow-y: auto;
+        margin-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+
+    <div class="page-header">
+        <h2>Administrator Dashboard</h2>
+        <div style="margin-left:auto;">
+            <form method="post" action="/auth/logout/" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="stats-grid">
+        <div class="stat-card" onclick="openUserModal()" style="cursor: pointer;">
+            <div class="stat-title">Total Registered Users</div>
+            <div class="stat-value">{{ total_users }}</div>
+            <div style="font-size: 0.8rem; color: #2563eb; margin-top: 5px;">Manage Users &rarr;</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-title">Assessments Completed</div>
+            <div class="stat-value">{{ total_screenings }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-title">Feedback</div>
+            <div class="stat-value">{{ total_feedback }}</div>
+            <div style="font-size:0.8rem; color:#64748b; margin-top:5px;">Pending Replies: {{ all_feedbacks|length }}
+            </div>
+        </div>
+
+        <div class="stat-card" style="border-left: 5px solid #ef4444;">
+            <div class="stat-title">High Risk Cases</div>
+            <div class="stat-value" style="font-size:1.5rem; color:#ef4444;">{{ high_risk_count }}</div>
+            <div style="font-size:0.9rem; color:#64748b; margin-top:5px;">Needs Attention</div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <!-- Chart Section -->
+        <div class="panel">
+            <div class="panel-header">Risk Level Distribution</div>
+            <canvas id="riskChart"></canvas>
+        </div>
+
+        <!-- Recent Table Section -->
+        <div class="panel">
+            <div class="panel-header">Assessment History (All)</div>
+            {% if recent_screenings %}
+            <div style="overflow-x: auto; max-height: 400px; overflow-y:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Score Prob.</th>
+                            <th>Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in recent_screenings %}
+                        <tr>
+                            <td>
+                                <strong>{{ s.user.first_name|default:s.user.username }}</strong><br>
+                                <span style="font-size:0.8rem; color:#94a3b8;">{{ s.user.email }}</span>
+                            </td>
+                            <td>{{ s.created_at|date:"M d, Y" }}</td>
+                            <td>{{ s.probability|floatformat:0 }}%</td>
+                            <td>
+                                <span class="risk-badge risk-{{ s.risk_level|lower }}">
+                                    {{ s.risk_level }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p style="color:#64748b; text-align:center; padding:2rem;">No assessments found.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Feedback Section -->
+    <div class="panel" style="margin-top: 2rem;">
+        <div class="panel-header">User Support & Feedback</div>
+        {% if all_feedbacks %}
+        <div style="overflow-x: auto; max-height: 400px; overflow-y:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">User</th>
+                        <th style="width: 20%;">Subject</th>
+                        <th style="width: 40%;">Message</th>
+                        <th style="width: 20%;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in all_feedbacks %}
+                    <tr>
+                        <td>
+                            <strong>{{ f.name }}</strong><br>
+                            <span style="font-size:0.8rem; color:#64748b;">{{ f.email }}</span><br>
+                            <span style="font-size:0.75rem; color:#94a3b8;">{{ f.created_at|date:"M d, H:i" }}</span>
+                        </td>
+                        <td>{{ f.subject }}</td>
+                        <td>
+                            <div style="max-height: 60px; overflow-y: auto; font-size: 0.9rem;">
+                                {{ f.message }}
+                            </div>
+                        </td>
+                        <td>
+                            {% if f.is_replied %}
+                            <span class="badge badge-success"
+                                style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px; font-size:0.8rem;">Replied</span>
+                            {% else %}
+                            <button onclick="openReplyModal('{{ f.id }}', '{{ f.name }}', '{{ f.subject }}')"
+                                class="action-btn" style="background:#2563eb;">Reply</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p style="color:#64748b; text-align:center; padding:2rem;">No feedback messages received.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- User List Modal -->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeUserModal()">&times;</span>
+        <h3 style="margin-top:0;">Registered Users</h3>
+        <div class="scrolly-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Date Joined</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in all_users %}
+                    <tr>
+                        <td><strong>{{ u.username }}</strong></td>
+                        <td>{{ u.email|default:"-" }}</td>
+                        <td>{{ u.date_joined|date:"M d, Y" }}</td>
+                        <td>
+                            {% if u.is_superuser %}
+                            <span style="color:#ef4444; font-weight:bold;">Admin</span>
+                            {% else %}
+                            User
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if not u.is_superuser %}
+                            <a href="/auth/delete-user/{{ u.id }}/"
+                                onclick="return confirm('Are you sure you want to delete user {{ u.username }}? This action cannot be undone.');"
+                                style="color:#ef4444; font-weight:600; text-decoration:none; font-size:0.9rem;">Delete</a>
+                            {% else %}
+                            <span style="color:#cbd5e1;">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Modal -->
+<div id="replyModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <span class="close" onclick="closeReplyModal()">&times;</span>
+        <h3 style="margin-top:0;">Reply to Feedback</h3>
+        <p style="margin-bottom: 20px;">Replying to: <strong id="replyToUser"></strong> - <em id="replyToSubject"></em>
+        </p>
+
+        <form id="replyForm" method="post" action="">
+            {% csrf_token %}
+            <label style="display:block; margin-bottom:8px; font-weight:600;">Your Reply:</label>
+            <textarea name="reply_message" rows="6"
+                style="width:100%; padding:10px; border-radius:6px; border:1px solid #e2e8f0; margin-bottom:15px; font-family:inherit;"
+                required></textarea>
+
+            <button type="submit" class="action-btn" style="background:#16a34a; width:100%;">Send Reply</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('riskChart').getContext('2d');
+    const riskData = {{ risk_data| safe }}; // [Low, Moderate, High]
+
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Low Risk', 'Moderate Risk', 'High Risk'],
+            datasets: [{
+                data: riskData,
+                backgroundColor: [
+                    '#22c55e', // Green
+                    '#f59e0b', // Amber
+                    '#ef4444'  // Red
+                ],
+                borderWidth: 0,
+                hoverOffset: 4,
+                hoverBorderColor: '#fff',
+                hoverBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            },
+            cutout: '65%'
+        }
+    });
+
+    // Reply Modal Logic
+    var replyModal = document.getElementById("replyModal");
+    var replyForm = document.getElementById("replyForm");
+
+    function openReplyModal(id, name, subject) {
+        document.getElementById("replyToUser").innerText = name;
+        document.getElementById("replyToSubject").innerText = subject;
+        replyForm.action = "/auth/reply-feedback/" + id + "/";
+        replyModal.style.display = "block";
+    }
+
+    function closeReplyModal() {
+        replyModal.style.display = "none";
+    }
+
+    // Modal Logic
+    var userModal = document.getElementById("userModal");
+    function openUserModal() {
+        userModal.style.display = "block";
+    }
+    function closeUserModal() {
+        userModal.style.display = "none";
+    }
+
+    // Close on click outside
+    window.onclick = function (event) {
+        if (event.target == userModal) {
+            userModal.style.display = "none";
+        }
+        if (event.target == replyModal) {
+            replyModal.style.display = "none";
+        }
+    }
+</script>
+{% endblock %}

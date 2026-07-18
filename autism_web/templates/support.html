@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}Help & Support | AutiScan{% endblock %}
+
+{% block extra_head %}
+<style>
+    .support-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem;
+        width: 100%;
+    }
+
+    .support-hero {
+        text-align: center;
+        margin-bottom: 4rem;
+        padding: 3rem 1rem;
+    }
+
+    /* Contact Grid */
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .contact-card {
+        background: var(--glass-bg);
+        padding: 2rem;
+        border-radius: 16px;
+        border: 1px solid var(--border-color);
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .contact-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.1);
+    }
+
+    .icon-circle {
+        width: 60px;
+        height: 60px;
+        background: var(--bg-accent);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+        max-width: 800px;
+        margin: 0 auto 4rem;
+    }
+
+    .faq-item {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        overflow: hidden;
+        transition: all 0.3s;
+    }
+
+    .faq-item:hover {
+        border-color: var(--primary-color);
+    }
+
+    details {
+        width: 100%;
+    }
+
+    summary {
+        padding: 1.2rem;
+        font-weight: 600;
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: var(--text-primary);
+        font-size: 1.1rem;
+    }
+
+    summary::-webkit-details-marker {
+        display: none;
+    }
+
+    summary::after {
+        content: '+';
+        font-size: 1.5rem;
+        font-weight: 300;
+        color: var(--primary-color);
+        transition: transform 0.3s;
+    }
+
+    details[open] summary::after {
+        transform: rotate(45deg);
+    }
+
+    details[open] summary {
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .faq-answer {
+        padding: 1.5rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        background: var(--bg-primary);
+        opacity: 0;
+        animation: slideDown 0.3s ease forwards;
+    }
+
+    @keyframes slideDown {
+        to {
+            opacity: 1;
+        }
+    }
+
+    /* Contact Form */
+    .form-box {
+        background: var(--glass-bg);
+        border-radius: 20px;
+        padding: 3rem;
+        border: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .contact-input {
+        width: 100%;
+        padding: 1rem 1.2rem;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s;
+        margin-bottom: 1.5rem;
+    }
+
+    .contact-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+
+    .success-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        z-index: 10;
+        backdrop-filter: blur(5px);
+    }
+
+    .success-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="support-container fade-in">
+
+    <!-- Hero -->
+    <div class="support-hero">
+        <h1 style="font-size: 3rem; margin-bottom: 1rem; color: var(--text-primary);">How can we help?</h1>
+        <p style="color: var(--text-secondary); font-size: 1.2rem; max-width: 600px; margin: 0 auto;">
+            Our support team is here for you. Browse FAQs or get in touch directly.
+        </p>
+    </div>
+
+    <!-- Contact Options -->
+    <div class="contact-grid">
+        <div class="contact-card">
+            <div class="icon-circle">✉️</div>
+            <h3 style="margin-bottom: 0.5rem;">Email Support</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">For general inquiries & feedback</p>
+            <a href="mailto:admin.autismscreening@gmail.com" class="btn btn-primary" style="width: 100%;">Email Us</a>
+        </div>
+
+        <div class="contact-card">
+            <div class="icon-circle">📞</div>
+            <h3 style="margin-bottom: 0.5rem;">Phone Support</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Mon-Fri, 9am - 6pm</p>
+            <a href="tel:+919876543210" class="btn" style="width: 100%; border: 1px solid var(--border-color);">+91
+                98765 43210</a>
+        </div>
+
+
+    </div>
+
+    <!-- FAQ -->
+    <div class="faq-section">
+        <h2 style="text-align: center; margin-bottom: 2.5rem; font-size: 2rem;">Frequently Asked Questions</h2>
+
+        <div class="faq-item">
+            <details>
+                <summary>Is this a medical diagnosis?</summary>
+                <div class="faq-answer">
+                    No. <strong>AutiScan</strong> is a screening tool designed to identify potential behavioral traits
+                    associated with the autism spectrum. It is not a substitute for a professional diagnosis. We
+                    strongly recommend consulting with a healthcare specialist for a formal assessment.
+                </div>
+            </details>
+        </div>
+
+        <div class="faq-item">
+            <details>
+                <summary>How accurate is the AI model?</summary>
+                <div class="faq-answer">
+                    Our model is trained on clinically validated datasets (AQ-10) and achieves high accuracy in
+                    identifying traits. However, like all screening tools, false positives or negatives can occur. Use
+                    the results as a guide, not a final answer.
+                </div>
+            </details>
+        </div>
+
+        <div class="faq-item">
+            <details>
+                <summary>Is my data kept private?</summary>
+                <div class="faq-answer">
+                    Yes. We take privacy seriously. Your assessment data is encrypted and stored securely. Only you and
+                    authorized administrators (for technical support) have access to your account details. We do not
+                    sell your data to third parties.
+                </div>
+            </details>
+        </div>
+
+        <div class="faq-item">
+            <details>
+                <summary>Can I delete my account and data?</summary>
+                <div class="faq-answer">
+                    Yes. You can request full data deletion by contacting our support team via email. We will process
+                    your request within 48 hours.
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="faq-section"> <!-- Reusing max-width wrapper -->
+        <div class="form-box">
+
+            {% if messages %}
+            {% for message in messages %}
+            <div
+                style="padding: 1rem; border-radius: 8px; margin-bottom: 2rem; text-align: center; 
+                    {% if message.tags == 'success' %}background: #dcfce7; color: #166534; border: 1px solid #bbf7d0;{% else %}background: #fee2e2; color: #991b1b; border: 1px solid #fecaca;{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <h2 style="text-align: center; margin-bottom: 2rem; color: var(--text-primary);">Send us a Message</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <input type="text" name="name" class="contact-input" placeholder="Your Name" required>
+                    <input type="email" name="email" class="contact-input" placeholder="Your Email" required>
+                </div>
+                <input type="text" name="subject" class="contact-input" placeholder="Subject" required>
+                <textarea name="message" class="contact-input" rows="5" placeholder="How can we help?"
+                    required></textarea>
+
+                <button type="submit" class="btn btn-primary"
+                    style="width: 100%; padding: 1rem; font-size: 1.1rem;">Submit Inquiry</button>
+            </form>
+        </div>
+    </div>
+
+    <div style="margin-top: 3rem; text-align: center;">
+        <a href="/dashboard/" style="color: var(--text-secondary); font-weight: 500;">&larr; Return to Dashboard</a>
+    </div>
+
+</div>
+{% endblock %}

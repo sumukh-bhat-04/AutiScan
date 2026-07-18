@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Assessment | Autism Screening{% endblock %}
+
+{% block extra_head %}
+<style>
+    .form-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        width: 100%;
+    }
+
+    .question-group {
+        text-align: left;
+        margin-bottom: 2rem;
+        background: var(--bg-primary);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+
+    .question-label {
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+        display: block;
+        font-size: 1.1rem;
+        color: var(--text-primary);
+    }
+
+    .question-select {
+        width: 100%;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+    .question-select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+    }
+
+    .section-title {
+        text-align: center;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+        font-size: 2rem;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        color: var(--text-secondary);
+        margin-bottom: 3rem;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="padding: 2rem; width: 100%;">
+    <div class="glass-panel form-container fade-in" style="padding: 3rem;">
+
+        <h1 class="section-title">Autism Screening (AQ-10)</h1>
+        <p class="section-subtitle">Please answer the questions below as honestly as possible. Your responses help our
+            AI model assess behavioral patterns.</p>
+
+        <form method="post" id="aq10Form">
+            {% csrf_token %}
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
+                <!-- Demographics -->
+                <div>
+                    <label for="age">Age</label>
+                    <input type="number" name="age" id="age" required class="question-select"
+                        style="width: 100%; max-width: none;">
+                </div>
+
+                <div>
+                    <label for="autism_history">Family History of Autism?</label>
+                    <select name="autism_history" id="autism_history" class="question-select">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="jaundice">History of Jaundice</label>
+                    <select name="jaundice" id="jaundice" class="question-select">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0;">
+
+            <!-- AQ-10 QUESTIONS -->
+
+            {% for i in "1,2,3,4,5,6,7,8,9,10"|make_list %}
+            <!-- We will use a custom template tag or just manual loop if simple -->
+            <!-- Since we cannot loop ranges easily in django templates without custom filters, let's just use manual blocks for clarity or a simple JS generator if we were lazy, but manual is safer here involves copy paste or cleaner structure. -->
+            {% endfor %}
+
+            <!-- Question 1 -->
+            <div class="question-group">
+                <span class="question-label">1. I am very sensitive to small sounds that other people often don’t
+                    notice.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A1" value="Always" required> Always</label>
+                    <label><input type="radio" name="A1" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A1" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A1" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-group">
+                <span class="question-label">2. I tend to focus more on small details than on the overall
+                    picture.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A2" value="Always" required> Always</label>
+                    <label><input type="radio" name="A2" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A2" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A2" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-group">
+                <span class="question-label">3. I find it difficult to do more than one task at the same time.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A3" value="Always" required> Always</label>
+                    <label><input type="radio" name="A3" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A3" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A3" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-group">
+                <span class="question-label">4. When I am interrupted, it is hard for me to return to what I was
+                    doing.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A4" value="Always" required> Always</label>
+                    <label><input type="radio" name="A4" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A4" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A4" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-group">
+                <span class="question-label">5. I often take what people say literally rather than reading between the
+                    lines.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A5" value="Always" required> Always</label>
+                    <label><input type="radio" name="A5" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A5" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A5" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-group">
+                <span class="question-label">6. I find it difficult to tell when someone listening to me is bored or
+                    losing interest.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A6" value="Always" required> Always</label>
+                    <label><input type="radio" name="A6" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A6" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A6" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-group">
+                <span class="question-label">7. When reading stories, I struggle to understand the characters’
+                    intentions or motives.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A7" value="Always" required> Always</label>
+                    <label><input type="radio" name="A7" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A7" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A7" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-group">
+                <span class="question-label">8. I enjoy collecting, organizing, or deeply learning about specific
+                    categories or topics.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A8" value="Always" required> Always</label>
+                    <label><input type="radio" name="A8" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A8" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A8" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <!-- Question 9 -->
+            <div class="question-group">
+                <span class="question-label">9. I find it hard to work out what other people are thinking or
+                    feelings.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A9" value="Always" required> Always</label>
+                    <label><input type="radio" name="A9" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A9" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A9" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <!-- Question 10 -->
+            <div class="question-group">
+                <span class="question-label">10. I often find it difficult to understand people’s intentions in social
+                    situations.</span>
+                <div class="radio-group" style="display:flex; gap:1rem; flex-wrap:wrap;">
+                    <label><input type="radio" name="A10" value="Always" required> Always</label>
+                    <label><input type="radio" name="A10" value="Sometimes"> Sometimes</label>
+                    <label><input type="radio" name="A10" value="Rarely"> Rarely</label>
+                    <label><input type="radio" name="A10" value="Never"> Never</label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary"
+                style="width: 100%; padding: 1rem; font-size: 1.2rem; margin-top: 1rem;">Analyze Responses</button>
+        </form>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="/dashboard/" style="color: var(--text-secondary); font-weight: 500;">Cancel and return to
+                Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Screening Result | AutiScan{% endblock %}
+
+{% block content %}
+<div class="fade-in"
+    style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+    <div class="glass-panel" style="width: 100%; max-width: 600px; padding: 3rem; text-align: center;">
+
+        <h2 style="font-size: 2rem; margin-bottom: 2rem; color: var(--text-primary);">Screening Analysis</h2>
+
+        <!-- Result Box -->
+        <!-- Using softer colors as requested: High (Purple), Moderate (Amber), Low (Green) -->
+        <div style="padding: 2.5rem; border-radius: 16px; margin-bottom: 2rem; transition: all 0.3s;
+            {% if risk == 'High' %}
+                background: #f3e8ff; border: 1px solid #d8b4fe; color: #6b21a8;
+            {% elif risk == 'Moderate' %}
+                background: #fffbeb; border: 1px solid #fde68a; color: #b45309;
+            {% else %}
+                background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d;
+            {% endif %}">
+
+            <h3 style="margin: 0 0 0.5rem; font-size: 1.75rem;">Risk Level: {{ risk }}</h3>
+
+            <p style="margin: 0; font-size: 1.1rem; opacity: 0.9;">
+                AI Indication Score: <strong>{{ probability }}%</strong>
+            </p>
+        </div>
+
+        <p style="color: var(--text-secondary); margin-bottom: 2.5rem; line-height: 1.6; font-size: 1.05rem;">
+            <strong>Important:</strong> This is a preliminary screening tool, <span
+                style="text-decoration: underline;">not</span> a medical diagnosis.
+            Behavioral patterns vary for everyone. We encourage using this result as a starting point for a conversation
+            with a healthcare professional.
+        </p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+            <a href="/predict/" class="btn btn-primary">Take Assessment Again</a>
+            <a href="/dashboard/" class="btn"
+                style="background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary);">Return
+                to Dashboard</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

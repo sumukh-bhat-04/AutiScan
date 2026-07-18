@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Autism Screening{% endblock %}</title>
+
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom Theme CSS -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+
+    <nav class="navbar glass-panel" style="border-radius: 0; border-left: none; border-right: none; margin-bottom: 0;">
+        <a href="/" class="nav-brand">AutiScan</a>
+
+        <div class="nav-links">
+            {% if user.is_authenticated %}
+            <a href="/dashboard/" class="nav-link">Dashboard</a>
+            <span class="nav-link" style="opacity: 0.6;">|</span>
+            <a href="/profile/" class="nav-link">Profile</a>
+            <form method="post" action="/auth/logout/" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary"
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem;">Logout</button>
+            </form>
+            {% else %}
+            <a href="/auth/login/" class="nav-link">Login</a>
+            <a href="/auth/register/" class="btn btn-primary">Get Started</a>
+            {% endif %}
+
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle Dark Mode">
+                <!-- Sun Icon -->
+                <svg id="sunIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    style="display:none;">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+                <!-- Moon Icon -->
+                <svg id="moonIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <div class="main-content" style="flex: 1; display: flex; flex-direction: column; width: 100%;">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="footer">
+        <p>&copy; {% now "Y" %} AutiScan. Designed with care.</p>
+    </footer>
+
+    <script>
+        // Theme Toggle Logic
+        const toggleBtn = document.getElementById('themeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const html = document.documentElement;
+
+        // 1. Check local storage or system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        let currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+
+        function applyTheme(theme) {
+            html.setAttribute('data-theme', theme);
+            if (theme === 'dark') {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+            } else {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+            }
+        }
+
+        applyTheme(currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(currentTheme);
+            localStorage.setItem('theme', currentTheme);
+        });
+    </script>
+</body>
+
+</html>
