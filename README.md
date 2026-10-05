@@ -81,7 +81,7 @@ AutiScan/
 &nbsp;&nbsp;&nbsp;&nbsp;The prediction is returned to the Django application and presented to the user.
 
 ### 🚀 Getting Started
-Prerequisites
+**Prerequisites**
 
 Make sure you have the following installed:
 
