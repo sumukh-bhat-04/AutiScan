@@ -7,7 +7,7 @@ venv/
 env/
 .venv/
 
-# Environment variables
+# Environment variables 
 .env
 
 # Django
